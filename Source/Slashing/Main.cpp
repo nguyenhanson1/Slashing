@@ -41,7 +41,7 @@ AMain::AMain()
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character move in the direction of input
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 650.f;
-	GetCharacterMovement()->AirControl = 0.2f;
+	GetCharacterMovement()->AirControl = 0.8f;
 	
 }
 
