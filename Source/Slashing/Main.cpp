@@ -43,7 +43,15 @@ AMain::AMain()
 	GetCharacterMovement()->JumpZVelocity = 650.f;
 	GetCharacterMovement()->AirControl = 0.8f;
 	
+	MaxHealth = 100.f;
+	Health = 65.f;
+	MaxStamina = 350.f;
+	Stamina = 120.f;
+	Coins = 0.f;
+
 }
+
+
 
 // Called when the game starts or when spawned
 void AMain::BeginPlay()
@@ -114,3 +122,25 @@ void AMain::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
+void AMain::DecrementHealth(float Amount)
+{
+	if (Health - Amount <= 0.f)
+	{
+		Health -= Amount;
+		Die();
+	}
+	else
+	{
+		Health -= Amount;
+	}
+}
+
+void AMain::IncrementCoins(int32 Amount)
+{
+	Coins += Amount;
+}
+
+void AMain::Die()
+{
+	Destroy();
+}
