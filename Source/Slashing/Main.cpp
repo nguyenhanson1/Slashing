@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 // Sets default values
 AMain::AMain()
 {
@@ -70,6 +71,7 @@ AMain::AMain()
 void AMain::BeginPlay()
 {
 	Super::BeginPlay();
+	UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation() + FVector(0.f, 0.f, 75.f), 25.f, 24, FLinearColor::Red, 5.f, 0.5f);
 	
 }
 
@@ -248,6 +250,8 @@ void AMain::Die()
 	Destroy();
 }
 
+
+
 void AMain::SetMovementStatus(EMovementStatus Status)
 {
 	MovementStatus = Status;
@@ -269,4 +273,13 @@ void AMain::ShiftKeyDown()
 void AMain::ShiftKeyUp()
 {
 	bShiftKeyDown = false;
+}
+
+void AMain::ShowPickupLocations()
+{
+	for (int32 i = 0; i < PickupLocations.Num(); i++)
+	{
+		UKismetSystemLibrary::DrawDebugSphere(this, PickupLocations[i], 25.f, 24, FLinearColor::Green, 5.f, 0.5f);
+	}
+	
 }
