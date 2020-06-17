@@ -68,17 +68,44 @@ void AEnemy::AgroSphereOnOverlapBegin(UPrimitiveComponent * OverlappedComponent,
 
 void AEnemy::AgroSphereOnOverlapEnd(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex)
 {
-
+	if (OtherActor)
+	{
+		AMain* Main = Cast<AMain>(OtherActor);
+		if (Main)
+		{
+			SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Idle);
+			if (AIController)
+			{
+				AIController->StopMovement();
+			}
+		}
+	}
+}
 }
 
 void AEnemy::CombatSphereOnOverlapBegin(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
-
+	if (OtherActor)
+	{
+		AMain* Main = Cast<AMain>(OtherActor);
+		if (Main)
+		{
+			SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Attacking);
+		}
+	}
 }
 
 void AEnemy::CombatSphereOnOverlapEnd(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex)
 {
-
+	if (OtherActor)
+	{
+		AMain* Main = Cast<AMain>(OtherActor);
+		if (Main)
+		{
+			SetEnemyMovementStatus(EEnemyMovementStatus::EMS_MoveToTarget);
+			MoveToTarget(Main);
+		}
+	}
 }
 
 void AEnemy::MoveToTarget(AMain* Target)
@@ -89,18 +116,17 @@ void AEnemy::MoveToTarget(AMain* Target)
 	{
 		FAIMoveRequest MoveRequest;
 		MoveRequest.SetGoalActor(Target);
-		MoveRequest.SetAcceptanceRadius(25.0f);
+		MoveRequest.SetAcceptanceRadius(10.0f);
 
 		FNavPathSharedPtr NavPath;
 
 		AIController->MoveTo(MoveRequest, &NavPath);
-
-		auto PathPoints = NavPath->GetPathPoints();
-		for (auto Point : PathPoints)
+		TArray<FNavPathPoint> PathPoints = NavPath->GetPathPoints();
+		for (FNavPathPoint Point : PathPoints)
 		{
-			FVector Location = Point.Location;
+			//FVector Location = Point.Location;
 
-			UKismetSystemLibrary::DrawDebugSphere(this, Location, 25.f, 24, FLinearColor::Green, 10.f, 1.5f);
+			//UKismetSystemLibrary::DrawDebugSphere(this, Location, 25.f, 16, FLinearColor::Green, 10.f, 0.5f);
 		}
 
 	}
