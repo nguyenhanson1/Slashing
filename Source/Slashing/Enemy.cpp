@@ -6,6 +6,7 @@
 #include "AIController.h"
 #include "Main.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Components/BoxComponent.h"
 
 
 // Sets default values
@@ -21,6 +22,8 @@ AEnemy::AEnemy()
 	CombatSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CombatSphere"));
 	CombatSphere->SetupAttachment(GetRootComponent());
 	CombatSphere->InitSphereRadius(125.f);
+
+	CombatCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("CombatCollision"));
 
 	bOverlappingCombatSphere = false;
 
