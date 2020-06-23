@@ -74,6 +74,10 @@ void AEnemy::CombatOnOverlapEnd(UPrimitiveComponent * OverlappedComponent, AActo
 void AEnemy::ActivateCollision()
 {
 	CombatCollision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	if (SwingSound)
+	{
+		UGameplayStatics::PlaySound2D(this, SwingSound);
+	}
 }
 
 void AEnemy::DeactivateCollision()
@@ -97,10 +101,7 @@ void AEnemy::Attack()
 			AnimInstance->Montage_Play(CombatMontage, 1.35f);
 			AnimInstance->Montage_JumpToSection(FName("Attack"), CombatMontage);
 		}
-		if (SwingSound)
-		{
-			UGameplayStatics::PlaySound2D(this, SwingSound);
-		}
+		
 	}
 }
 
@@ -187,6 +188,7 @@ void AEnemy::CombatSphereOnOverlapBegin(UPrimitiveComponent * OverlappedComponen
 		AMain* Main = Cast<AMain>(OtherActor);
 		if (Main)
 		{
+			Main->SetCombatTarget(this);
 			CombatTarget = Main;
 			bOverlappingCombatSphere = true;
 			Attack();
@@ -201,6 +203,7 @@ void AEnemy::CombatSphereOnOverlapEnd(UPrimitiveComponent * OverlappedComponent,
 		AMain* Main = Cast<AMain>(OtherActor);
 		if (Main)
 		{
+			Main->SetCombatTarget(nullptr);
 			bOverlappingCombatSphere = false;
 			if (EnemyMovementStatus == EEnemyMovementStatus::EMS_Attacking)
 			{
