@@ -13,6 +13,7 @@ enum class EEnemyMovementStatus : uint8
 	EMS_Idle			UMETA(DisplayName = "Idle"),
 	EMS_MoveToTarget	UMETA(DisplayName = "MoveToTarget"),
 	EMS_Attacking		UMETA(DisplayName = "Attacking"),
+	EMS_Dead			UMETA(DisplayName = "Dead"),
 
 	EMS_MAX				UMETA(DisplayName = "DefaultMAX")
 };
@@ -31,6 +32,8 @@ public:
 	EEnemyMovementStatus EnemyMovementStatus;
 
 	FORCEINLINE void SetEnemyMovementStatus(EEnemyMovementStatus Status) { EnemyMovementStatus = Status; }
+
+	FORCEINLINE EEnemyMovementStatus GetEnemyMovementStatus() { return EnemyMovementStatus; }
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	class USphereComponent* AgroSphere;
@@ -96,6 +99,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
 	float AttackMaxTime;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	TSubclassOf<UDamageType> DamageTypeClass;
+
 	UFUNCTION()
 	void CombatOnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
 
@@ -127,4 +133,12 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const & DamageEvent, class AController * EventInstigator, AActor * DamageCauser) override;
+
+	void Die();
+
+	UFUNCTION(BlueprintCallable)
+	void DeathEnd();
+
+	bool Alive();
 };

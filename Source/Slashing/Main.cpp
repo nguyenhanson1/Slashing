@@ -2,18 +2,25 @@
 
 
 #include "Main.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
-#include "Weapon.h"
-#include "Components/SkeletalMeshComponent.h"
-#include "Animation/AnimInstance.h"
-#include "Kismet/GameplayStatics.h"
-#include "Sound/SoundCue.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "Enemy.h"
+#include "Weapon.h"
+
+#include "Animation/AnimInstance.h"
+
+#include "Camera/CameraComponent.h"
+
+#include "Sound/SoundCue.h"
+
+#include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
+#include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+
+#include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
+
 
 // Sets default values
 AMain::AMain()
@@ -295,6 +302,13 @@ void AMain::DecrementHealth(float Amount)
 	}
 }
 
+float AMain::TakeDamage(float DamageAmount, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
+{
+	Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	DecrementHealth(DamageAmount);
+	return DamageAmount;
+}
+
 void AMain::IncrementCoins(int32 Amount)
 {
 	Coins += Amount;
@@ -302,7 +316,13 @@ void AMain::IncrementCoins(int32 Amount)
 
 void AMain::Die()
 {
-	Destroy();
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+
+	if (AnimInstance && CombatMontage)
+	{
+		AnimInstance->Montage_Play(CombatMontage, 1.0f);
+		AnimInstance->Montage_JumpToSection(FName("Death"));
+	}
 }
 
 
