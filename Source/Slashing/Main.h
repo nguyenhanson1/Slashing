@@ -37,6 +37,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat")
 	bool bHasCombatTarget;
 
+	FORCEINLINE void SetHasCombatTarget(bool HasTarget) { bHasCombatTarget = HasTarget; }
+
 	UPROPERTY(BlueprintReadWrite)
 	FVector CombatTargetLocation;
 

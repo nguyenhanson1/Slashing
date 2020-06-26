@@ -201,6 +201,10 @@ void AMain::Tick(float DeltaTime)
 	if (CombatTarget)
 	{
 		CombatTargetLocation = CombatTarget->GetActorLocation();
+		if (MainplayerController)
+		{
+			MainplayerController->EnemyLocation = CombatTargetLocation;
+		}
 	}
 
 }
