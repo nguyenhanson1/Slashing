@@ -1,10 +1,8 @@
-
-
-
 #include "Enemy.h"
 #include "Main.h"
 #include "AIController.h"
 #include "TimerManager.h"
+#include "MainPlayerController.h"
 
 #include "Engine/SkeletalMeshSocket.h"
 
@@ -195,6 +193,10 @@ void AEnemy::AgroSphereOnOverlapEnd(UPrimitiveComponent * OverlappedComponent, A
 		AMain* Main = Cast<AMain>(OtherActor);
 		if (Main)
 		{
+			if (Main->MainplayerController)
+			{
+				Main->MainplayerController->RemoveEnemyHealthBar();
+			}
 			SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Idle);
 			if (AIController)
 			{
@@ -213,6 +215,10 @@ void AEnemy::CombatSphereOnOverlapBegin(UPrimitiveComponent * OverlappedComponen
 		if (Main)
 		{
 			Main->SetCombatTarget(this);
+			if (Main->MainplayerController)
+			{
+				Main->MainplayerController->DisplayEnemyHealthBar();
+			}
 			CombatTarget = Main;
 			bOverlappingCombatSphere = true;
 			Attack();

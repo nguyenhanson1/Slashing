@@ -4,6 +4,7 @@
 #include "Main.h"
 #include "Enemy.h"
 #include "Weapon.h"
+#include "MainPlayerController.h"
 
 #include "Animation/AnimInstance.h"
 
@@ -82,6 +83,7 @@ AMain::AMain()
 	InterpSpeed = 15.f;
 	bInterpToEnemy = false;
 
+	bHasCombatTarget = false;
 }
 
 
@@ -90,8 +92,8 @@ AMain::AMain()
 void AMain::BeginPlay()
 {
 	Super::BeginPlay();
-	UKismetSystemLibrary::DrawDebugSphere(this, GetActorLocation() + FVector(0.f, 0.f, 75.f), 25.f, 24, FLinearColor::Red, 5.f, 0.5f);
-
+	
+	MainplayerController = Cast<AMainPlayerController>(GetController());
 
 	
 }
@@ -100,6 +102,7 @@ void AMain::BeginPlay()
 void AMain::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 	float DeltaStamina = StaminaDrainRate * DeltaTime;
 
 	switch (StaminaStatus)
@@ -193,6 +196,11 @@ void AMain::Tick(float DeltaTime)
 		FRotator InterpRotation = FMath::RInterpTo(GetActorRotation(), LookAtYaw, DeltaTime, InterpSpeed);
 
 		SetActorRotation(InterpRotation);
+	}
+
+	if (CombatTarget)
+	{
+		CombatTargetLocation = CombatTarget->GetActorLocation();
 	}
 
 }
