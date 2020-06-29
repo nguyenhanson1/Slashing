@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Engine/World.h"
 #include "Sound/SoundCue.h"
+#include "Kismet/GameplayStatics.h"
 
 APickup::APickup()
 {
@@ -21,9 +22,11 @@ void APickup::OnOverlapBegin(UPrimitiveComponent * OverlappedComponent, AActor *
 		if (Main)
 		{
 			Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
-
 			UE_LOG(LogTemp, Warning, TEXT("Call Pickup::OnOverlapBegin()"));
-
+			if (Super::OverlapSound)
+			{
+				UGameplayStatics::PlaySound2D(this, Super::OverlapSound);
+			}
 
 			Main->IncrementCoins(CoinCount);
 			Main->PickupLocations.Add(GetActorLocation());

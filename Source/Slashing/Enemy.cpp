@@ -32,6 +32,8 @@ AEnemy::AEnemy()
 	AgroSphere = CreateDefaultSubobject<USphereComponent>(TEXT("AgroSphere"));
 	AgroSphere->SetupAttachment(GetRootComponent());
 	AgroSphere->InitSphereRadius(600.f);
+	AgroSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Ignore);
+
 
 	CombatSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CombatSphere"));
 	CombatSphere->SetupAttachment(GetRootComponent());
@@ -46,8 +48,8 @@ AEnemy::AEnemy()
 	MaxHealth = 100.f;
 	Damage = 10.f;
 
-	AttackMaxTime = 0.5f;
-	AttackMinTime = 3.5f;
+	AttackMaxTime = 1.5f;
+	AttackMinTime = 0.5f;
 
 	EnemyMovementStatus = EEnemyMovementStatus::EMS_Idle;
 
@@ -232,7 +234,8 @@ void AEnemy::CombatSphereOnOverlapBegin(UPrimitiveComponent * OverlappedComponen
 			}
 			CombatTarget = Main;
 			bOverlappingCombatSphere = true;
-			Attack();
+			float AttackTime = FMath::FRandRange(AttackMinTime, AttackMaxTime);
+			GetWorldTimerManager().SetTimer(AttackTimer, this, &AEnemy::Attack, AttackTime);
 		}
 	}
 }
@@ -322,6 +325,7 @@ void AEnemy::DeathEnd()
 {
 	GetMesh()->bPauseAnims = true;
 	GetMesh()->bNoSkeletonUpdate = true;
+	
 }
 
 bool AEnemy::Alive()
