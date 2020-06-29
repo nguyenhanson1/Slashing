@@ -43,7 +43,6 @@ void AExplosive::OnOverlapEnd(UPrimitiveComponent * OverlappedComponent, AActor 
 	Super::OnOverlapEnd(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
 
 	UE_LOG(LogTemp, Warning, TEXT("Call Explosive::OnOverLapEnd()"));
-
 }
 
 
