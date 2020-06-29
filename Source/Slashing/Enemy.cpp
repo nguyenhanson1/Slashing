@@ -50,6 +50,8 @@ AEnemy::AEnemy()
 	AttackMinTime = 3.5f;
 
 	EnemyMovementStatus = EEnemyMovementStatus::EMS_Idle;
+
+	bHasValidTarget = false;
 }
 
 
@@ -60,6 +62,7 @@ void AEnemy::CombatOnOverlapBegin(UPrimitiveComponent * OverlappedComponent, AAc
 		AMain* Main = Cast<AMain>(OtherActor);
 		if (Main)
 		{
+
 			if (Main->HitParticles)
 			{
 				const USkeletalMeshSocket* TipSocket = GetMesh()->GetSocketByName("TipSocket");
@@ -103,7 +106,7 @@ void AEnemy::DeactivateCollision()
 
 void AEnemy::Attack()
 {
-	if (Alive())
+	if (Alive() && bHasValidTarget)
 	{
 		if (AIController)
 		{
@@ -193,6 +196,7 @@ void AEnemy::AgroSphereOnOverlapEnd(UPrimitiveComponent * OverlappedComponent, A
 		AMain* Main = Cast<AMain>(OtherActor);
 		if (Main)
 		{
+			bHasValidTarget = false;
 			if (Main->CombatTarget)
 			{
 				Main->SetCombatTarget(nullptr);
@@ -219,7 +223,7 @@ void AEnemy::CombatSphereOnOverlapBegin(UPrimitiveComponent * OverlappedComponen
 		AMain* Main = Cast<AMain>(OtherActor);
 		if (Main)
 		{
-
+			bHasValidTarget = true;
 			Main->SetCombatTarget(this);
 			Main->SetHasCombatTarget(true);
 			if (Main->MainplayerController)
