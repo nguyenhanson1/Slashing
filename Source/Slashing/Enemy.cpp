@@ -160,6 +160,9 @@ void AEnemy::BeginPlay()
 	CombatCollision->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
 	CombatCollision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	CombatCollision->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+
+	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 }
 
 // Called every frame
@@ -204,10 +207,9 @@ void AEnemy::AgroSphereOnOverlapEnd(UPrimitiveComponent * OverlappedComponent, A
 				Main->SetCombatTarget(nullptr);
 			}
 			Main->SetHasCombatTarget(false);
-			if (Main->MainplayerController)
-			{
-				Main->MainplayerController->RemoveEnemyHealthBar();
-			}
+			
+			Main->UpdateCombatTarget();
+			
 			SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Idle);
 			if (AIController)
 			{
@@ -226,12 +228,12 @@ void AEnemy::CombatSphereOnOverlapBegin(UPrimitiveComponent * OverlappedComponen
 		if (Main)
 		{
 			bHasValidTarget = true;
+
 			Main->SetCombatTarget(this);
 			Main->SetHasCombatTarget(true);
-			if (Main->MainplayerController)
-			{
-				Main->MainplayerController->DisplayEnemyHealthBar();
-			}
+			
+			Main->UpdateCombatTarget();
+
 			CombatTarget = Main;
 			bOverlappingCombatSphere = true;
 			float AttackTime = FMath::FRandRange(AttackMinTime, AttackMaxTime);
@@ -249,11 +251,22 @@ void AEnemy::CombatSphereOnOverlapEnd(UPrimitiveComponent * OverlappedComponent,
 		{
 			
 			bOverlappingCombatSphere = false;
-			if (EnemyMovementStatus == EEnemyMovementStatus::EMS_Attacking)
+			MoveToTarget(Main);
+			CombatTarget = nullptr;
+
+			if (Main->CombatTarget == this)
 			{
-				MoveToTarget(Main);
-				CombatTarget = nullptr;
+				Main->SetCombatTarget(nullptr);
+				Main->bHasCombatTarget = false;
+				Main->UpdateCombatTarget();
 			}
+			if (Main->MainPlayerController)
+			{
+				USkeletalMeshComponent* MainMesh = Cast<USkeletalMeshComponent>(OtherComp);
+				if (MainMesh) Main->MainPlayerController->RemoveEnemyHealthBar();
+			}
+
+
 			GetWorldTimerManager().ClearTimer(AttackTimer);
 		}
 	}
@@ -292,7 +305,7 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const & DamageEvent, A
 	if (Health - DamageAmount <= 0.0f)
 	{
 		Health -= DamageAmount;
-		Die();
+		Die(DamageCauser);
 	}
 	else
 	{
@@ -302,8 +315,9 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const & DamageEvent, A
 	return DamageAmount;
 }
 
-void AEnemy::Die()
+void AEnemy::Die(AActor* Causer)
 {
+	SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Dead);
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	
 	if (AnimInstance)
@@ -311,7 +325,7 @@ void AEnemy::Die()
 		AnimInstance->Montage_Play(CombatMontage, 1.00f);
 		AnimInstance->Montage_JumpToSection(FName("Death"),CombatMontage);
 	}
-	SetEnemyMovementStatus(EEnemyMovementStatus::EMS_Dead);
+	
 
 	CombatCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	AgroSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -319,6 +333,12 @@ void AEnemy::Die()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 	bAttacking = false;
+	
+	AMain* Main = Cast<AMain>(Causer);
+	if (Main)
+	{
+		Main->UpdateCombatTarget();
+	}
 }
 
 void AEnemy::DeathEnd()

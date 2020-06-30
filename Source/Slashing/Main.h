@@ -45,7 +45,7 @@ public:
 	FVector CombatTargetLocation;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Controller")
-	class AMainPlayerController* MainplayerController;
+	class AMainPlayerController* MainPlayerController;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AI")
 	class UParticleSystem* HitParticles;
@@ -210,4 +210,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DeathEnd();
 
+	void UpdateCombatTarget();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Combat")
+	TSubclassOf<AEnemy> EnemyFilter;
 };

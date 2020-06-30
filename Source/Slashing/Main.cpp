@@ -96,7 +96,7 @@ void AMain::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	MainplayerController = Cast<AMainPlayerController>(GetController());
+	MainPlayerController = Cast<AMainPlayerController>(GetController());
 
 	
 }
@@ -207,9 +207,9 @@ void AMain::Tick(float DeltaTime)
 	if (CombatTarget)
 	{
 		CombatTargetLocation = CombatTarget->GetActorLocation();
-		if (MainplayerController)
+		if (MainPlayerController)
 		{
-			MainplayerController->EnemyLocation = CombatTargetLocation;
+			MainPlayerController->EnemyLocation = CombatTargetLocation;
 		}
 	}
 
@@ -484,4 +484,46 @@ void AMain::DeathEnd()
 {
 	GetMesh()->bPauseAnims = true;
 	GetMesh()->bNoSkeletonUpdate = true;
+}
+
+void AMain::UpdateCombatTarget()
+{
+	TArray<AActor*> OverlappingActors;
+	GetOverlappingActors(OverlappingActors, EnemyFilter);
+
+	if (OverlappingActors.Num() == 0)
+	{
+		if (MainPlayerController)
+		{
+			MainPlayerController->RemoveEnemyHealthBar();
+		}
+		return;
+	}
+	AEnemy* ClosestEnemy = Cast<AEnemy>(OverlappingActors[0]);
+	if (ClosestEnemy)
+	{
+		FVector Location = GetActorLocation();
+		float MinDistance = (ClosestEnemy->GetActorLocation() - Location).Size();
+
+		for (auto Actor : OverlappingActors)
+		{
+			AEnemy* Enemy = Cast<AEnemy>(Actor);
+			if (Enemy)
+			{
+				float DistanceToActor = (Enemy->GetActorLocation() - Location).Size();
+				if (DistanceToActor < MinDistance)
+				{
+					MinDistance = DistanceToActor;
+					ClosestEnemy = Enemy;
+				}
+			}
+		}
+		if (MainPlayerController)
+		{
+			MainPlayerController->DisplayEnemyHealthBar();
+		}
+		SetCombatTarget(ClosestEnemy);
+		bHasCombatTarget = true;
+	}
+	
 }
