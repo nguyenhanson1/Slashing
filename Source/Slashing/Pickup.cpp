@@ -10,7 +10,7 @@
 
 APickup::APickup()
 {
-	CoinCount = 1;
+	
 }
 
 void APickup::OnOverlapBegin(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
@@ -21,14 +21,15 @@ void APickup::OnOverlapBegin(UPrimitiveComponent * OverlappedComponent, AActor *
 		AMain* Main = Cast<AMain>(OtherActor);
 		if (Main)
 		{
+			OnPickupBP(Main);
 			Super::OnOverlapBegin(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
 			UE_LOG(LogTemp, Warning, TEXT("Call Pickup::OnOverlapBegin()"));
 			if (Super::OverlapSound)
 			{
 				UGameplayStatics::PlaySound2D(this, Super::OverlapSound);
 			}
+			
 
-			Main->IncrementCoins(CoinCount);
 			Main->PickupLocations.Add(GetActorLocation());
 
 			Destroy();

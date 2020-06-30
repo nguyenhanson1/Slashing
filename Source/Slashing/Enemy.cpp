@@ -339,6 +339,8 @@ void AEnemy::Die(AActor* Causer)
 	{
 		Main->UpdateCombatTarget();
 	}
+
+	DeactivateCollision();
 }
 
 void AEnemy::DeathEnd()
