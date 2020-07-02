@@ -5,6 +5,7 @@
 #include "Enemy.h"
 #include "Weapon.h"
 #include "MainPlayerController.h"
+#include "SlashingSaveGame.h"
 
 #include "Animation/AnimInstance.h"
 
@@ -538,4 +539,54 @@ void AMain::UpdateCombatTarget()
 		bHasCombatTarget = true;
 	}
 	
+}
+
+void AMain::SwitchLevel(FName LevelName)
+{
+	UWorld* World = GetWorld();
+
+	if (World)
+	{
+		FString CurrentLevel = World->GetMapName();
+		FName CurrentLevelName(*CurrentLevel);
+		if (CurrentLevelName != LevelName)
+		{
+			UGameplayStatics::OpenLevel(World, LevelName);
+		}
+	}
+	
+}
+
+void AMain::SaveGame()
+{
+	USlashingSaveGame* SaveGameInstance = Cast<USlashingSaveGame>(UGameplayStatics::CreateSaveGameObject(USlashingSaveGame::StaticClass()));
+
+	SaveGameInstance->CharacterStats.Health = Health;
+	SaveGameInstance->CharacterStats.MaxHealth = MaxHealth;
+	SaveGameInstance->CharacterStats.Stamina = Stamina;
+	SaveGameInstance->CharacterStats.MaxStamina = MaxStamina;
+	SaveGameInstance->CharacterStats.Coins = Coins;
+	SaveGameInstance->CharacterStats.Location = GetActorLocation();
+	SaveGameInstance->CharacterStats.Rotation = GetActorRotation();
+
+	UGameplayStatics::SaveGameToSlot(SaveGameInstance, SaveGameInstance->PlayerName, SaveGameInstance->UserIndex);
+}
+
+void AMain::LoadGame(bool SetPosition)
+{
+	USlashingSaveGame* LoadGameInstance = Cast<USlashingSaveGame>(UGameplayStatics::CreateSaveGameObject(USlashingSaveGame::StaticClass()));
+
+	LoadGameInstance = Cast<USlashingSaveGame>(UGameplayStatics::LoadGameFromSlot(LoadGameInstance->PlayerName, LoadGameInstance->UserIndex));
+
+	Health = LoadGameInstance->CharacterStats.Health;
+	MaxHealth = LoadGameInstance->CharacterStats.MaxHealth;
+	Stamina = LoadGameInstance->CharacterStats.Stamina;
+	MaxStamina = LoadGameInstance->CharacterStats.MaxStamina;
+	Coins = LoadGameInstance->CharacterStats.Coins;
+
+	if (SetPosition)
+	{
+		SetActorLocation(LoadGameInstance->CharacterStats.Location);
+		SetActorRotation(LoadGameInstance->CharacterStats.Rotation);
+	}
 }
