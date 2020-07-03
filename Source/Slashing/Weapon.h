@@ -25,6 +25,10 @@ class SLASHING_API AWeapon : public AItem
 public:
 	AWeapon();
 
+
+	UPROPERTY(EditDefaultsOnly, Category = "SaveData")
+	FString Name;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Item")
 	EWeaponState WeaponState;
 

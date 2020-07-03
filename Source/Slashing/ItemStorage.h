@@ -21,5 +21,8 @@ protected:
 
 public:
 
+	UPROPERTY(EditDefaultsOnly, Category = "SaveData")
 	TMap<FString, TSubclassOf<class AWeapon>> WeaponMap;
+
+	
 };
