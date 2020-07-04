@@ -36,11 +36,23 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Widgets")
 	UUserWidget* PauseMenu;
 
+	/** Condition and function for the Enemy Health Bar*/
 	bool bEnemyHealthBarVisible;
 
 	void DisplayEnemyHealthBar();
 
 	void RemoveEnemyHealthBar();
+
+	/** Condition and function for the Pause Menu*/
+	bool bPauseMenuVisible;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "HUD")
+	void DisplayPauseMenu();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "HUD")
+	void RemovePauseMenu();
+
+	void TogglePauseMenu();
 
 	FVector EnemyLocation;
 
