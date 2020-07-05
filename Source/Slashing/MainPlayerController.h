@@ -56,6 +56,8 @@ public:
 
 	FVector EnemyLocation;
 
+	void GameModeOnly();
+
 protected:
 	virtual void BeginPlay() override;
 
