@@ -11,6 +11,7 @@ void AMainPlayerController::DisplayEnemyHealthBar()
 		bEnemyHealthBarVisible = true;
 		EnemyHealthBar->SetVisibility(ESlateVisibility::Visible);
 	}
+
 }
 
 void AMainPlayerController::RemoveEnemyHealthBar()
