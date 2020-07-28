@@ -353,7 +353,6 @@ void AMain::LMBDown()
 		{
 			Weapon->Equip(this);
 			SetActiveOverlappingItem(nullptr);
-			
 		}
 	}
 	else if (EquippedWeapon)

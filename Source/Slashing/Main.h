@@ -160,6 +160,14 @@ public:
 
 	virtual void Jump() override;
 
+	UPROPERTY(BlueprintReadWrite)
+	float Damage;
+	UPROPERTY(BlueprintReadWrite)
+	float Armor;
+	UPROPERTY(BlueprintReadWrite)
+	float Speed;
+	UPROPERTY(BlueprintReadWrite)
+	float Recovery;
 
 protected:
 	// Called when the game starts or when spawned
