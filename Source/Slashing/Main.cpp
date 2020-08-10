@@ -127,7 +127,7 @@ void AMain::Tick(float DeltaTime)
 
 	if (MovementStatus == EMovementStatus::EMS_Dead) return;
 
-	float DeltaStamina = StaminaDrainRate * DeltaTime;
+	float DeltaStamina = StaminaDrainRate * DeltaTime * StaminaRechargeMultiplier;
 
 	switch (StaminaStatus)
 	{
@@ -211,6 +211,8 @@ void AMain::Tick(float DeltaTime)
 			SetMovementStatus(EMovementStatus::EMS_Normal);
 		}
 		break;
+
+
 	default:
 		;
 	}
@@ -472,7 +474,6 @@ void AMain::BeginRolling() {
 			Stamina -= RollingStamina;
 			SetMovementStatus(EMovementStatus::EMS_Rolling);
 
-
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			AnimInstance->Montage_Play(CombatMontage, 2.0f);
 			AnimInstance->Montage_JumpToSection(FName("RollForward"), CombatMontage);
@@ -490,6 +491,7 @@ void AMain::BeginRolling() {
 
 void AMain::EndRolling() {
 	AttackEnd();
+	SetStaminaStatus(EStaminaStatus::ESS_Normal);
 	if (bShiftKeyDown)
 	{
 		SetMovementStatus(EMovementStatus::EMS_Sprinting);

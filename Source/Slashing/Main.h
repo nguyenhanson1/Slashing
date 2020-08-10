@@ -23,7 +23,7 @@ enum class EStaminaStatus : uint8
 	ESS_BelowMinimum UMETA(DisplayName = "BelowMinimum"),
 	ESS_Exhausted UMETA(DisplayName = "Exhausted"),
 	ESS_ExhaustedRecovering UMETA(DisplayName = "ExhaustedRecovering"),
-
+	ESS_NotRecovering UMETA(DisplayName = "NotRecovering"),
 	ESS_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
@@ -108,6 +108,8 @@ public:
 	bool bShiftKeyDown;
 
 	float RollingStamina;
+	
+	float 
 
 	/** Begin Rolling function in the animation blueprint*/
 	UFUNCTION(BlueprintCallable)
