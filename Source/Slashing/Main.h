@@ -12,6 +12,7 @@ enum class EMovementStatus : uint8
 	EMS_Normal UMETA(DisplayName = "Normal"), 
 	EMS_Sprinting UMETA(DisplayName = "Sprinting"),
 	EMS_Dead UMETA(DisplayName = "Dead"),
+	EMS_Rolling UMETA(DisplayName = "Rolling"),
 	EMS_MAX UMETA(DisplayName = "DefaultMAX")
 };
 
@@ -21,7 +22,7 @@ enum class EStaminaStatus : uint8
 	ESS_Normal UMETA(DisplayName = "Normal"),
 	ESS_BelowMinimum UMETA(DisplayName = "BelowMinimum"),
 	ESS_Exhausted UMETA(DisplayName = "Exhausted"),
-	ESS_ExhautedRecovering UMETA(DisplayName = "ExhaustedRecovering"),
+	ESS_ExhaustedRecovering UMETA(DisplayName = "ExhaustedRecovering"),
 
 	ESS_MAX UMETA(DisplayName = "DefaultMAX")
 };
@@ -106,10 +107,22 @@ public:
 
 	bool bShiftKeyDown;
 
+	float RollingStamina;
+
+	/** Begin Rolling function in the animation blueprint*/
+	UFUNCTION(BlueprintCallable)
+	void BeginRolling();
+
+	/** End Rolling function in the animation blueprint*/
+	UFUNCTION(BlueprintCallable)
+	void EndRolling();
+
 	/** Press down to enable sprinting */
 	void ShiftKeyDown();
 	/** Released to stop sprinting */
 	void ShiftKeyUp();
+
+	
 
 	/** Camera boom positioning the camera behind the player */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -160,6 +173,13 @@ public:
 
 	virtual void Jump() override;
 
+	/**
+	*	Function To make the player roll forward and become invunerable to damage
+	*
+	*/
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Anims")
+	void Roll();
+
 	UPROPERTY(BlueprintReadWrite)
 	float Damage;
 	UPROPERTY(BlueprintReadWrite)
@@ -197,6 +217,8 @@ public:
 	bool bMovingRight;
 
 	bool CanMove(float Value);
+
+	bool bNotRolling;
 
 	/** Called via input to turn at a given rate
 	*	@param Rate This is a normalized rate, i.e. 1.0 means 100% of desired rate

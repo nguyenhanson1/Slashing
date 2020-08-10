@@ -83,6 +83,7 @@ AMain::AMain()
 
 	StaminaDrainRate = 25.f;
 	MinSprintStamina = 50.f;
+	RollingStamina = 25.f;
 
 	InterpSpeed = 15.f;
 	bInterpToEnemy = false;
@@ -91,6 +92,7 @@ AMain::AMain()
 
 	bMovingForward = false;
 	bMovingRight = false;
+	bNotRolling = true;
 }
 
 
@@ -130,7 +132,7 @@ void AMain::Tick(float DeltaTime)
 	switch (StaminaStatus)
 	{
 	case EStaminaStatus::ESS_Normal:
-		if (bShiftKeyDown && (bMovingForward || bMovingRight))
+		if (bShiftKeyDown && (bMovingForward || bMovingRight) && bNotRolling)
 		{
 			if (Stamina - DeltaStamina <= MinSprintStamina)
 			{
@@ -157,7 +159,7 @@ void AMain::Tick(float DeltaTime)
 		}
 		break;
 	case EStaminaStatus::ESS_BelowMinimum:
-		if (bShiftKeyDown && (bMovingForward || bMovingRight))
+		if (bShiftKeyDown && (bMovingForward || bMovingRight) && bNotRolling)
 		{
 			if (Stamina - DeltaStamina <= 0.f)
 			{
@@ -193,11 +195,11 @@ void AMain::Tick(float DeltaTime)
 		}
 		else 
 		{
-			SetStaminaStatus(EStaminaStatus::ESS_ExhautedRecovering);
+			SetStaminaStatus(EStaminaStatus::ESS_ExhaustedRecovering);
 			Stamina += DeltaStamina;
 		}
 		break;
-	case EStaminaStatus::ESS_ExhautedRecovering:
+	case EStaminaStatus::ESS_ExhaustedRecovering:
 		if (Stamina + DeltaStamina >= MinSprintStamina)
 		{
 			SetStaminaStatus(EStaminaStatus::ESS_Normal);
@@ -322,7 +324,8 @@ bool AMain::CanMove(float Value)
 		return ((Value != 0.0f) && 
 			(!bAttacking) &&
 			(MovementStatus != EMovementStatus::EMS_Dead)) &&
-			!MainPlayerController->bPauseMenuVisible;
+			!MainPlayerController->bPauseMenuVisible &&
+			bNotRolling;
 	}
 	
 	return false;
@@ -346,7 +349,7 @@ void AMain::LMBDown()
 
 	if (MainPlayerController) if (MainPlayerController->bPauseMenuVisible) return;
 
-	if (ActiveOverlappingItem)
+	if (ActiveOverlappingItem && ActiveOverlappingItem != EquippedWeapon)
 	{
 		AWeapon* Weapon = Cast<AWeapon>(ActiveOverlappingItem);
 		if (Weapon)
@@ -354,6 +357,7 @@ void AMain::LMBDown()
 			Weapon->Equip(this);
 			SetActiveOverlappingItem(nullptr);
 		}
+
 	}
 	else if (EquippedWeapon)
 	{
@@ -447,14 +451,55 @@ void AMain::Die()
 
 void AMain::Jump()
 {
-	if (MainPlayerController) if (MainPlayerController->bPauseMenuVisible) return;
-
-	if (MovementStatus != EMovementStatus::EMS_Dead)
-	{
-		Super::Jump();
-	}
+	if (MainPlayerController) if (MainPlayerController->bPauseMenuVisible) if (MovementStatus != EMovementStatus::EMS_Dead) return;
+	
+	BeginRolling();
 }
 
+
+void AMain::Roll_Implementation() {
+	if (MainPlayerController) if (MainPlayerController->bPauseMenuVisible) if (MovementStatus != EMovementStatus::EMS_Dead) return;
+
+	BeginRolling();
+}
+
+void AMain::BeginRolling() {
+	if (bNotRolling)
+	{
+		bNotRolling = false;
+		if (Stamina >= MinSprintStamina)
+		{
+			Stamina -= RollingStamina;
+			SetMovementStatus(EMovementStatus::EMS_Rolling);
+
+
+			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+			AnimInstance->Montage_Play(CombatMontage, 2.0f);
+			AnimInstance->Montage_JumpToSection(FName("RollForward"), CombatMontage);
+
+		}
+		else
+		{
+			SetStaminaStatus(EStaminaStatus::ESS_BelowMinimum);
+			bNotRolling = true;
+		}
+	}
+	
+	
+}
+
+void AMain::EndRolling() {
+	AttackEnd();
+	if (bShiftKeyDown)
+	{
+		SetMovementStatus(EMovementStatus::EMS_Sprinting);
+	}
+	else
+	{
+		SetMovementStatus(EMovementStatus::EMS_Normal);
+	}
+	bNotRolling = true;
+}
 
 
 void AMain::SetInterpToEnemy(bool Interp)
@@ -509,7 +554,7 @@ void AMain::SetEquippedWeapon(AWeapon * WeaponToSet)
 
 void AMain::Attack() 
 {
-	if (!bAttacking && MovementStatus != EMovementStatus::EMS_Dead)
+	if (!bAttacking && MovementStatus != EMovementStatus::EMS_Dead && bNotRolling)
 	{
 		bAttacking = true;
 		SetInterpToEnemy(true);
