@@ -109,7 +109,7 @@ public:
 
 	float RollingStamina;
 	
-	float 
+	float StaminaRechargeMultiplier;
 
 	/** Begin Rolling function in the animation blueprint*/
 	UFUNCTION(BlueprintCallable)

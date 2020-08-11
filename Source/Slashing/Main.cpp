@@ -83,7 +83,8 @@ AMain::AMain()
 
 	StaminaDrainRate = 25.f;
 	MinSprintStamina = 50.f;
-	RollingStamina = 25.f;
+	RollingStamina = 40.f;
+	StaminaRechargeMultiplier = 1.0f;
 
 	InterpSpeed = 15.f;
 	bInterpToEnemy = false;
@@ -471,6 +472,8 @@ void AMain::BeginRolling() {
 		bNotRolling = false;
 		if (Stamina >= MinSprintStamina)
 		{
+			
+
 			Stamina -= RollingStamina;
 			SetMovementStatus(EMovementStatus::EMS_Rolling);
 
@@ -478,10 +481,15 @@ void AMain::BeginRolling() {
 			AnimInstance->Montage_Play(CombatMontage, 2.0f);
 			AnimInstance->Montage_JumpToSection(FName("RollForward"), CombatMontage);
 
+			StaminaRechargeMultiplier = 0.0f;
+
+			if (Stamina < MinSprintStamina)
+			{
+				SetStaminaStatus(EStaminaStatus::ESS_Exhausted);
+			}
 		}
 		else
 		{
-			SetStaminaStatus(EStaminaStatus::ESS_BelowMinimum);
 			bNotRolling = true;
 		}
 	}
@@ -491,7 +499,7 @@ void AMain::BeginRolling() {
 
 void AMain::EndRolling() {
 	AttackEnd();
-	SetStaminaStatus(EStaminaStatus::ESS_Normal);
+	StaminaRechargeMultiplier = 1.0f;
 	if (bShiftKeyDown)
 	{
 		SetMovementStatus(EMovementStatus::EMS_Sprinting);
