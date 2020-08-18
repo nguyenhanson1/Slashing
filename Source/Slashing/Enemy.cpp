@@ -311,7 +311,13 @@ float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const & DamageEvent, A
 	{
 		Health -= DamageAmount;
 	}
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 
+	/*if (AnimInstance)
+	{
+		AnimInstance->Montage_Play(CombatMontage, 1.00f);
+		AnimInstance->Montage_JumpToSection(FName("Death"), CombatMontage);
+	}*/
 	return DamageAmount;
 }
 
