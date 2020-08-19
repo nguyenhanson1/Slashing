@@ -500,7 +500,8 @@ void AMain::BeginRolling() {
 void AMain::EndRolling() {
 	AttackEnd();
 	StaminaRechargeMultiplier = 1.0f;
-	if (bShiftKeyDown)
+	
+	if (bShiftKeyDown && Stamina >= MinSprintStamina)
 	{
 		SetMovementStatus(EMovementStatus::EMS_Sprinting);
 	}
