@@ -58,7 +58,7 @@ AMain::AMain()
 	bUseControllerRotationRoll = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character move in the direction of input
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.f, 0.0f); // ...at this rotation rate
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 10000.f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->JumpZVelocity = 650.f;
 	GetCharacterMovement()->AirControl = 0.8f;
 	
@@ -86,7 +86,7 @@ AMain::AMain()
 	RollingStamina = 40.f;
 	StaminaRechargeMultiplier = 1.0f;
 
-	InterpSpeed = 15.f;
+	InterpSpeed = 65.f;
 	bInterpToEnemy = false;
 
 	bHasCombatTarget = false;
@@ -473,14 +473,14 @@ void AMain::BeginRolling() {
 		if (Stamina >= MinSprintStamina)
 		{
 			
-
+			
 			Stamina -= RollingStamina;
 			SetMovementStatus(EMovementStatus::EMS_Rolling);
 
 			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 			AnimInstance->Montage_Play(CombatMontage, 2.0f);
 			AnimInstance->Montage_JumpToSection(FName("RollForward"), CombatMontage);
-
+			
 			StaminaRechargeMultiplier = 0.0f;
 
 			if (Stamina < MinSprintStamina)
