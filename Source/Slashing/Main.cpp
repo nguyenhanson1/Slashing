@@ -86,6 +86,7 @@ AMain::AMain()
 	RollingStamina = 40.f;
 	StaminaRechargeMultiplier = 1.0f;
 
+	// Initialize rotation speed and booleans checks
 	InterpSpeed = 65.f;
 	bInterpToEnemy = false;
 
@@ -103,11 +104,15 @@ void AMain::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	// Get the player controller at the beginning of the level
 	MainPlayerController = Cast<AMainPlayerController>(GetController());
 
+	// Get the map name for possible travel between levels, this contain extra information of streaming level prefix
 	FString Map = GetWorld()->GetMapName();
+	// remove streaming level prefix and leave only the level name remaining
 	Map.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
 
+	// if the name is SunTemple then load the save file
 	if (Map == "SunTemple")
 	{
 		LoadGameNoSwitch();
@@ -455,8 +460,7 @@ void AMain::Die()
 void AMain::Jump()
 {
 	if (MainPlayerController) if (MainPlayerController->bPauseMenuVisible) if (MovementStatus != EMovementStatus::EMS_Dead) return;
-	
-	BeginRolling();
+	ACharacter::Jump();
 }
 
 
@@ -466,51 +470,51 @@ void AMain::Roll_Implementation() {
 	BeginRolling();
 }
 
-void AMain::BeginRolling() {
-	if (bNotRolling)
-	{
-		bNotRolling = false;
-		if (Stamina >= MinSprintStamina)
-		{
-			
-			
-			Stamina -= RollingStamina;
-			SetMovementStatus(EMovementStatus::EMS_Rolling);
+//void AMain::BeginRolling() {
+//	if (bNotRolling)
+//	{
+//		bNotRolling = false;
+//		if (Stamina >= MinSprintStamina)
+//		{
+//			
+//			
+//			Stamina -= RollingStamina;
+//			SetMovementStatus(EMovementStatus::EMS_Rolling);
+//
+//			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+//			AnimInstance->Montage_Play(CombatMontage, 2.0f);
+//			AnimInstance->Montage_JumpToSection(FName("RollForward"), CombatMontage);
+//			
+//			StaminaRechargeMultiplier = 0.0f;
+//
+//			if (Stamina < MinSprintStamina)
+//			{
+//				SetStaminaStatus(EStaminaStatus::ESS_Exhausted);
+//			}
+//		}
+//		else
+//		{
+//			bNotRolling = true;
+//		}
+//	}
+//	
+//	
+//}
 
-			UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
-			AnimInstance->Montage_Play(CombatMontage, 2.0f);
-			AnimInstance->Montage_JumpToSection(FName("RollForward"), CombatMontage);
-			
-			StaminaRechargeMultiplier = 0.0f;
-
-			if (Stamina < MinSprintStamina)
-			{
-				SetStaminaStatus(EStaminaStatus::ESS_Exhausted);
-			}
-		}
-		else
-		{
-			bNotRolling = true;
-		}
-	}
-	
-	
-}
-
-void AMain::EndRolling() {
-	AttackEnd();
-	StaminaRechargeMultiplier = 1.0f;
-	
-	if (bShiftKeyDown && Stamina >= MinSprintStamina)
-	{
-		SetMovementStatus(EMovementStatus::EMS_Sprinting);
-	}
-	else
-	{
-		SetMovementStatus(EMovementStatus::EMS_Normal);
-	}
-	bNotRolling = true;
-}
+//void AMain::EndRolling() {
+//	AttackEnd();
+//	StaminaRechargeMultiplier = 1.0f;
+//	
+//	if (bShiftKeyDown && Stamina >= MinSprintStamina)
+//	{
+//		SetMovementStatus(EMovementStatus::EMS_Sprinting);
+//	}
+//	else
+//	{
+//		SetMovementStatus(EMovementStatus::EMS_Normal);
+//	}
+//	bNotRolling = true;
+//}
 
 
 void AMain::SetInterpToEnemy(bool Interp)
